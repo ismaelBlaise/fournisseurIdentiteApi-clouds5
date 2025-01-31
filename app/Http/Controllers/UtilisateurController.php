@@ -498,7 +498,7 @@ class UtilisateurController extends Controller
             }
 
              
-            $utilisateurData = $utilisateur->only(['id_utilisateurs', 'etat']);
+            $utilisateurData = $utilisateur->only(['id_utilisateurs','nb_tentative' ,'etat']);
 
              
             return response()->json($utilisateurData, 200);
