@@ -500,21 +500,26 @@
             }
         },
         "/api/utilisateurs/recuperer-compte": {
-            "get": {
-                "summary": "Récupérer les informations d'un utilisateur",
-                "description": "Retourne l'id et l'état d'un utilisateur à partir de son email.",
-                "operationId": "6434aade4ad97862f5459f02ac293718",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "Email de l'utilisateur",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+            "post": {
+                "summary": "Récupérer les informations d'un utilisateur par email",
+                "description": "Retourne l'id et l'état d'un utilisateur à partir de son email, passé en JSON dans le corps de la requête.",
+                "operationId": "72f64edff1191cc74fca784860d8c0c8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "description": "Email de l'utilisateur",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Utilisateur récupéré avec succès",

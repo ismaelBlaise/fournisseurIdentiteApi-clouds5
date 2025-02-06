@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 use App\DataTransferObjects\ValidationPinDTO;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+
 
 
 /**
@@ -275,9 +275,9 @@ class UtilisateurController extends Controller
      */
     public function inscrireUtilisateur(Request $request)
     {    
+
         try {
-             
-           
+                        
             $validatedData = $request->validate([
                 'email' => 'required|email|unique:utilisateurs,email',  
                 'nom' => 'required|string|max:255',
@@ -288,8 +288,7 @@ class UtilisateurController extends Controller
             ]);
              
             $sexeDTO = new SexeDTO($validatedData['sexe'],"");  
-
- 
+            
             $utilisateurDTO = new UtilisateurDTO(
                 $this->nextId,   
                 $validatedData['email'],
@@ -302,11 +301,12 @@ class UtilisateurController extends Controller
                 $sexeDTO
             );
 
-             
-            $url = $this->utilisateurService->inscrireUtilisateur($utilisateurDTO);
 
-            
-            return response()->json($url, 202);
+            $url = $this->utilisateurService->inscrireUtilisateur($utilisateurDTO);
+            $urx = "Email Sent";
+
+            return response()->json(['url' => $urx], 200);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
              
             return response()->json([
@@ -442,7 +442,7 @@ class UtilisateurController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/utilisateur",
+     *     path="/api/utilisateurs/recuperer-compte",
      *     summary="Récupérer les informations d'un utilisateur par email",
      *     description="Retourne l'id et l'état d'un utilisateur à partir de son email, passé en JSON dans le corps de la requête.",
      *     @OA\RequestBody(
@@ -498,8 +498,35 @@ class UtilisateurController extends Controller
             }
 
              
-            $utilisateurData = $utilisateur->only(['id_utilisateurs','nb_tentative' ,'etat']);
+            $utilisateurData = $utilisateur->only(['id_utilisateurs','mot_de_passe','nb_tentative' ,'etat']);
+             
+            return response()->json($utilisateurData, 200);
 
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+
+
+    public function recupererUtilisateurParId(Request $request)
+    {
+        try {
+            
+            $id = $request->input('id');
+            
+            
+            $utilisateur = Utilisateur::where('id_utilisateurs', $id)->first();
+
+            if (!$utilisateur) {
+                return response()->json(['error' => 'Utilisateur introuvable.'], 404);
+            }
+
+             
+            $utilisateurData = $utilisateur;
              
             return response()->json($utilisateurData, 200);
 
@@ -546,11 +573,9 @@ class UtilisateurController extends Controller
     {
         try {
             $this->utilisateurService->reinitialiserTentative($request->input('token'));
-            return response()->json(['message' => 'Tentatives réinitialisées avec succès !'], 200);
+            return response()->view('reinitialisation', ['message' => 'Tentatives réinitialisées avec succès !']);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'message' => $e->getMessage()], 400);
+            return response()->view('reinitialisation', ['message' => 'Échec de la réinitialisation : ' . $e->getMessage()], 400);
         }
     }
 
@@ -611,13 +636,12 @@ class UtilisateurController extends Controller
             if ($tokens && strpos($tokens, '0x0:') === 0) {
                 return response()->json(['message' => substr($tokens, 4)], 404);
             }
-            
+
             if ($tokens === null) {
-                throw new \RuntimeException('Erreur de validation');
+                throw new \RuntimeException('Code pin incorrect ou expirer');
             }
 
-            
-            return response()->json(['token' => $tokens], 200);
+            return response()->json(['token' => $tokens->token], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),

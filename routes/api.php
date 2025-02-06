@@ -27,6 +27,7 @@ Route::prefix('utilisateurs')->group(function () {
     Route::post('/connexion', [UtilisateurController::class, 'connexion']);
     Route::get('/valider-compte', [UtilisateurController::class, 'validerCompte']);
     Route::post('/recuperer-compte', [UtilisateurController::class, 'recupererUtilisateur']);
+    Route::post('/recuperer-utilisateur', [UtilisateurController::class, 'recupererUtilisateurParId']);
     Route::get('/reinitialiser-tentative', [UtilisateurController::class, 'reinitialiserTentative']);
     Route::post('/valider-pin', [UtilisateurController::class, 'validationPin']);
 });

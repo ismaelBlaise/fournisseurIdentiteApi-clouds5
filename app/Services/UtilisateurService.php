@@ -26,9 +26,12 @@ class UtilisateurService
 {
     private $tokenService;
 
-    public function __construct(TokenService $tokenService)
+    private $codePinService;
+
+    public function __construct(TokenService $tokenService,CodePinService $code)
     {
         $this->tokenService = $tokenService;  
+        $this->codePinService= $code;
     }
 
     public function save(UtilisateurDTO $data)
@@ -266,7 +269,7 @@ class UtilisateurService
             $this->resetNbTentative($utilisateur);
             $token = $this->tokenService->creationToken($utilisateur);
             $codePinEntity->delete();
-            return $token->token;
+            return $token;
         }
 
         $this->incrementNbTentative($utilisateur);

@@ -6,6 +6,7 @@ use App\Mail\EmailCodePin;
 use App\Models\CodePin;
 use App\Models\Utilisateur;
 use App\Repositories\CodePinRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class CodePinService
     public function envoyerCodePin(Utilisateur $utilisateur): int
     {
         $code = random_int(100000, 999999);  
-        $expiration = now()->addSeconds(90);  
+        $expiration = Carbon::now()->addSeconds(90);  
 
         
         while (CodePin::where('codepin', operator: $code)->exists()) {
